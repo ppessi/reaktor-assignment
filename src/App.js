@@ -40,13 +40,13 @@ const App = () => {
           })
         ).then((responses) => {
           const availability = {};
-          const parser = new DOMParser();
-          [].concat(...responses).forEach((item) => {
-            const xmlDoc = parser.parseFromString(item.DATAPAYLOAD, "text/xml");
-            availability[item.id.toLowerCase()] =
-              xmlDoc.getElementsByTagName("INSTOCKVALUE")[0].innerHTML ===
-              "INSTOCK";
-          });
+          responses.forEach((list) =>
+            list.forEach((item) => {
+              availability[item.id.toLowerCase()] = !item.DATAPAYLOAD.includes(
+                "OUT"
+              );
+            })
+          );
           setAvailability(availability);
           setLoading(false);
         });
