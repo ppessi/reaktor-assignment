@@ -8,15 +8,20 @@ const App = () => {
   const [items, setItems] = useState({});
   const [availability, setAvailability] = useState({});
   const [filter, setFilter] = useState("");
+  const [errored, setErrored] = useState(new Set());
 
   useEffect(() => {
     const api_url = "https://bad-api-assignment.reaktor.com";
     const manufacturers = new Set();
-    const fetchProductInfo = (category) => {
+    const fetchProductInfo = (category, count = 1) => {
       fetch(`${api_url}/products/${category}`)
         .then((res) => res.json())
         .then((res) => {
           setItems((items) => ({ ...items, [category]: res }));
+          setErrored(
+            (errored) =>
+              new Set([...errored].filter((value) => value !== category))
+          );
           const newManufacturers = new Set(
             res.map((item) => item.manufacturer)
           );
@@ -27,10 +32,17 @@ const App = () => {
             manufacturers.add(manufacturer);
             fetchAvailability(manufacturer);
           }
+        })
+        .catch(() => {
+          if (count < 5) {
+            fetchProductInfo(category, count + 1);
+          } else {
+            setErrored((errored) => new Set([...errored, category]));
+          }
         });
     };
 
-    const fetchAvailability = (manufacturer) => {
+    const fetchAvailability = (manufacturer, count = 1) => {
       fetch(`${api_url}/availability/${manufacturer}`)
         .then((res) => res.json())
         .then((res) => res.response)
@@ -45,13 +57,24 @@ const App = () => {
             ...oldAvailability,
             ...availability,
           }));
+          setErrored(
+            (errored) =>
+              new Set([...errored].filter((value) => value !== manufacturer))
+          );
+        })
+        .catch(() => {
+          if (count < 5) {
+            fetchAvailability(manufacturer, count + 1);
+          } else {
+            setErrored((errored) => new Set([...errored, manufacturer]));
+          }
         });
     };
 
     for (const category of categories) {
       fetchProductInfo(category);
     }
-  }, [categories, setItems, setAvailability]);
+  }, [categories, setItems, setAvailability, setErrored]);
 
   const filterHandler = (e) => {
     setFilter(e.target.value);
@@ -63,6 +86,12 @@ const App = () => {
 
   return (
     <>
+      {errored.size !== 0 && (
+        <div style={{ color: "red" }}>
+          Fetching data for following categories/manufacturers failed:{" "}
+          {[...errored].join(", ")}
+        </div>
+      )}
       {categories.map((category) => (
         <button key={category} onClick={select(category)}>
           {category}
