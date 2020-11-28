@@ -1,0 +1,16 @@
+#root {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button {
+  border: none;
+  font-size: 1.2em;
+  margin: 20px 5px 30px 5px;
+  padding: 10px;
+  background-color: rgb(159, 223, 248);
+  border-radius: 8px;
+}
+
+.list {
+  margin-top: 40px;
+}

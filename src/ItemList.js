@@ -1,10 +1,9 @@
 import { React, useState, useEffect } from "react";
-import { List } from "react-virtualized";
-
-import Item from "./Item";
+import { Grid } from "react-virtualized";
 
 export const ItemList = ({ items, filter, selected, availability }) => {
   const [filtered, setFiltered] = useState([]);
+  const widths = [300, 70, 40, 120, 180];
 
   useEffect(() => {
     if (filter === "") {
@@ -18,20 +17,48 @@ export const ItemList = ({ items, filter, selected, availability }) => {
     }
   }, [filter, selected, items]);
 
-  const renderRow = ({ index, key, style }) => {
-    const item = filtered[index];
+  const renderCell = ({ columnIndex, rowIndex, key, style }) => {
+    const item = filtered[rowIndex];
+    var content = (() => {
+      switch (columnIndex) {
+        case 0:
+          return item.name;
+        case 1:
+          return item.manufacturer;
+        case 2:
+          return item.price;
+        case 3:
+          return item.color.join(", ");
+        case 4:
+          const inStock = availability[item.id];
+          return inStock === undefined ? (
+            <div style={{ color: "grey" }}>Loading availity data</div>
+          ) : inStock ? (
+            <div style={{ color: "green" }}>in stock</div>
+          ) : (
+            <div style={{ color: "red" }}>out of stock</div>
+          );
+        default:
+          return "";
+      }
+    })();
     return (
-      <Item key={key} style={style} {...item} inStock={availability[item.id]} />
+      <div key={key} style={style}>
+        {content}
+      </div>
     );
   };
 
   return (
-    <List
-      width={400}
-      height={800}
-      rowHeight={100}
+    <Grid
+      className="list"
+      cellRenderer={renderCell}
+      columnCount={5}
+      columnWidth={({ index }) => widths[index]}
+      height={600}
+      width={widths.reduce((sum, width) => sum + width, 30)}
+      rowHeight={40}
       rowCount={filtered.length}
-      rowRenderer={renderRow}
     />
   );
 };
