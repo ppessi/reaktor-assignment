@@ -1,22 +1,27 @@
 import { React, useState, useEffect } from "react";
 import { Grid } from "react-virtualized";
 
-export const ItemList = ({ items, filter, selected, availability }) => {
+export const ItemList = ({ items, filters, selected, availability }) => {
   const [filtered, setFiltered] = useState([]);
   const widths = [300, 120, 60, 120, 180];
   const columns = ["Name", "Manufacturer", "Price", "Colors", "Availability"];
 
   useEffect(() => {
-    if (filter === "") {
-      setFiltered(items[selected]);
-    } else {
-      setFiltered(
-        items[selected].filter((item) =>
-          item.name.includes(filter.toUpperCase())
-        )
+    var newFiltered = items[selected];
+    if (filters.name !== "" && filters.name !== undefined)
+      newFiltered = newFiltered.filter((item) =>
+        item.name.includes(filters.name.toUpperCase())
       );
-    }
-  }, [filter, selected, items]);
+    if (filters.manufacturer !== "" && filters.manufacturer !== undefined)
+      newFiltered = newFiltered.filter(
+        (item) => item.manufacturer === filters.manufacturer
+      );
+    if (filters.availability !== -1 && filters.availability !== undefined)
+      newFiltered = newFiltered.filter(
+        (item) => availability[item.id] === filters.availability
+      );
+    setFiltered(newFiltered);
+  }, [filters, selected, items, availability]);
 
   const renderCell = ({ columnIndex, rowIndex, key, style }) => {
     const item = filtered[rowIndex];

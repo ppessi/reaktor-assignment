@@ -2,14 +2,16 @@ import { React, useState, useMemo, useEffect } from "react";
 
 import ItemList from "./ItemList";
 import CategorySelect from "./CategorySelect";
+import Filters from "./Filters";
 
 const App = () => {
   const categories = useMemo(() => ["accessories", "jackets", "shirts"], []);
   const [selected, setSelected] = useState(categories[0]);
   const [items, setItems] = useState({});
   const [availability, setAvailability] = useState({});
-  const [filter, setFilter] = useState("");
+  const [filters, setFilters] = useState({});
   const [errored, setErrored] = useState(new Set());
+  const [manufacturers, setManufacturers] = useState([]);
 
   useEffect(() => {
     const api_url = "https://bad-api-assignment.reaktor.com";
@@ -32,6 +34,7 @@ const App = () => {
             }
             manufacturers.add(manufacturer);
             fetchAvailability(manufacturer);
+            setManufacturers([...manufacturers]);
           }
         })
         .catch(() => {
@@ -78,11 +81,7 @@ const App = () => {
     for (const category of categories) {
       fetchProductInfo(category);
     }
-  }, [categories, setItems, setAvailability, setErrored]);
-
-  const filterHandler = (e) => {
-    setFilter(e.target.value);
-  };
+  }, [categories, setItems, setAvailability, setErrored, setManufacturers]);
 
   const selectCategory = (category) => () => {
     setSelected(category);
@@ -103,12 +102,10 @@ const App = () => {
       />
       {selected in items ? (
         <>
-          <div>
-            Filter by name: <input type="text" onChange={filterHandler} />
-          </div>
+          <Filters setFilters={setFilters} manufacturers={manufacturers} />
           <ItemList
             items={items}
-            filter={filter}
+            filters={filters}
             selected={selected}
             availability={availability}
           />
