@@ -7,51 +7,51 @@ const App = () => {
   const [selected, setSelected] = useState(categories[0]);
   const [items, setItems] = useState({});
   const [availability, setAvailability] = useState({});
-  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
 
   useEffect(() => {
     const api_url = "https://bad-api-assignment.reaktor.com";
-    Promise.all(
-      categories.map((category) => {
-        return fetch(`${api_url}/products/${category}`)
-          .then((res) => res.json())
-          .then((res) => ({ [category]: res }));
-      })
-    )
-      .then((content) => {
-        const items = content.reduce(
-          (prev, current) => ({ ...prev, ...current }),
-          {}
-        );
-        setItems(items);
-        return new Set(
-          []
-            .concat(...content.map((object) => Object.values(object)[0]))
-            .map((item) => item.manufacturer)
-        );
-      })
-      .then((manufacturers) => {
-        Promise.all(
-          [...manufacturers].map((manufacturer) => {
-            return fetch(`${api_url}/availability/${manufacturer}`)
-              .then((res) => res.json())
-              .then((res) => res.response);
-          })
-        ).then((responses) => {
-          const availability = {};
-          responses.forEach((list) =>
-            list.forEach((item) => {
-              availability[item.id.toLowerCase()] = !item.DATAPAYLOAD.includes(
-                "OUT"
-              );
-            })
+    const manufacturers = new Set();
+    const fetchProductInfo = (category) => {
+      fetch(`${api_url}/products/${category}`)
+        .then((res) => res.json())
+        .then((res) => {
+          setItems((items) => ({ ...items, [category]: res }));
+          const newManufacturers = new Set(
+            res.map((item) => item.manufacturer)
           );
-          setAvailability(availability);
-          setLoading(false);
+          for (const manufacturer of newManufacturers) {
+            if (manufacturers.has(manufacturer)) {
+              continue;
+            }
+            manufacturers.add(manufacturer);
+            fetchAvailability(manufacturer);
+          }
         });
-      });
-  }, [categories, setLoading, setItems, setAvailability]);
+    };
+
+    const fetchAvailability = (manufacturer) => {
+      fetch(`${api_url}/availability/${manufacturer}`)
+        .then((res) => res.json())
+        .then((res) => res.response)
+        .then((res) => {
+          const availability = {};
+          res.forEach((item) => {
+            availability[item.id.toLowerCase()] = !item.DATAPAYLOAD.includes(
+              "OUT"
+            );
+          });
+          setAvailability((oldAvailability) => ({
+            ...oldAvailability,
+            ...availability,
+          }));
+        });
+    };
+
+    for (const category of categories) {
+      fetchProductInfo(category);
+    }
+  }, [categories, setItems, setAvailability]);
 
   const filterHandler = (e) => {
     setFilter(e.target.value);
@@ -61,24 +61,28 @@ const App = () => {
     setSelected(category);
   };
 
-  return loading ? (
-    <div>Loading data from server</div>
-  ) : (
+  return (
     <>
       {categories.map((category) => (
         <button key={category} onClick={select(category)}>
           {category}
         </button>
       ))}
-      <div>
-        Filter by name: <input type="text" onChange={filterHandler} />
-      </div>
-      <ItemList
-        items={items}
-        filter={filter}
-        selected={selected}
-        availability={availability}
-      />
+      {selected in items ? (
+        <>
+          <div>
+            Filter by name: <input type="text" onChange={filterHandler} />
+          </div>
+          <ItemList
+            items={items}
+            filter={filter}
+            selected={selected}
+            availability={availability}
+          />
+        </>
+      ) : (
+        <div>Loading data from server</div>
+      )}
     </>
   );
 };
