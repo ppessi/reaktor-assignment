@@ -5,9 +5,13 @@ export const Item = ({ style, name, color, price, manufacturer, inStock }) => {
     <div style={style}>
       <div style={{ fontWeight: "bold" }}>{name}</div>
       <div>Colors: {color.join(", ")}</div>
-      <div>{price}€</div>
+      <div>Price: {price}€</div>
       <div>Manufactured by {manufacturer}</div>
-      <div>{inStock ? "in stock" : "out of stock"}</div>
+      {inStock ? (
+        <div style={{ color: "green" }}>in stock</div>
+      ) : (
+        <div style={{ color: "red" }}>out of stock</div>
+      )}
     </div>
   );
 };
