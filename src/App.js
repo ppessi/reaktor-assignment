@@ -49,9 +49,12 @@ const App = () => {
         .then((res) => {
           const availability = {};
           res.forEach((item) => {
-            availability[item.id.toLowerCase()] = !item.DATAPAYLOAD.includes(
-              "OUT"
-            );
+            const data = item.DATAPAYLOAD;
+            availability[item.id.toLowerCase()] = data.includes("OUT")
+              ? 0 // out of stock
+              : data.includes("LESSTHAN10")
+              ? 1 // less than 10
+              : 2; // in stock
           });
           setAvailability((oldAvailability) => ({
             ...oldAvailability,

@@ -33,10 +33,12 @@ export const ItemList = ({ items, filter, selected, availability }) => {
           const inStock = availability[item.id];
           return inStock === undefined ? (
             <div style={{ color: "grey" }}>Loading availity data</div>
-          ) : inStock ? (
-            <div style={{ color: "green" }}>in stock</div>
-          ) : (
+          ) : inStock === 0 ? (
             <div style={{ color: "red" }}>out of stock</div>
+          ) : inStock === 1 ? (
+            <div style={{ color: "orange" }}>less than 10</div>
+          ) : (
+            <div style={{ color: "green" }}>in stock</div>
           );
         default:
           return "";
