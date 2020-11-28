@@ -3,7 +3,8 @@ import { Grid } from "react-virtualized";
 
 export const ItemList = ({ items, filter, selected, availability }) => {
   const [filtered, setFiltered] = useState([]);
-  const widths = [300, 70, 40, 120, 180];
+  const widths = [300, 120, 60, 120, 180];
+  const columns = ["Name", "Manufacturer", "Price", "Colors", "Availability"];
 
   useEffect(() => {
     if (filter === "") {
@@ -45,23 +46,41 @@ export const ItemList = ({ items, filter, selected, availability }) => {
       }
     })();
     return (
-      <div key={key} style={style}>
+      <div
+        key={key}
+        style={{
+          ...style,
+          backgroundColor: rowIndex % 2 === 0 ? "#e2e2e2" : "white",
+          lineHeight: `${style.height}px`,
+        }}
+      >
         {content}
       </div>
     );
   };
 
   return (
-    <Grid
-      className="list"
-      cellRenderer={renderCell}
-      columnCount={5}
-      columnWidth={({ index }) => widths[index]}
-      height={600}
-      width={widths.reduce((sum, width) => sum + width, 30)}
-      rowHeight={40}
-      rowCount={filtered.length}
-    />
+    <>
+      <div className="header">
+        {columns.map((col, idx) => (
+          <span
+            key={idx}
+            style={{ float: "left", width: widths[idx], height: 30 }}
+          >
+            {col}
+          </span>
+        ))}
+      </div>
+      <Grid
+        cellRenderer={renderCell}
+        columnCount={5}
+        columnWidth={({ index }) => widths[index]}
+        height={600}
+        width={widths.reduce((sum, width) => sum + width, 30)}
+        rowHeight={40}
+        rowCount={filtered.length}
+      />
+    </>
   );
 };
 export default ItemList;
