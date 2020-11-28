@@ -1,7 +1,6 @@
 import { React, useState, useMemo, useEffect } from "react";
-import { List } from "react-virtualized";
 
-import Item from "./Item";
+import ItemList from "./ItemList";
 
 const App = () => {
   const categories = useMemo(() => ["accessories", "jackets", "shirts"], []);
@@ -9,6 +8,7 @@ const App = () => {
   const [items, setItems] = useState({});
   const [availability, setAvailability] = useState({});
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("");
 
   useEffect(() => {
     const api_url = "https://bad-api-assignment.reaktor.com";
@@ -53,21 +53,14 @@ const App = () => {
       });
   }, [categories, setLoading, setItems, setAvailability]);
 
+  const filterHandler = (e) => {
+    setFilter(e.target.value);
+  };
+
   const select = (category) => () => {
     setSelected(category);
   };
 
-  const renderRow = ({ index, key, style }) => {
-    const item = items[selected][index];
-    return (
-      <Item
-        key={key}
-        style={style}
-        {...items[selected][index]}
-        inStock={availability[item.id]}
-      />
-    );
-  };
   return loading ? (
     <div>Loading data from server</div>
   ) : (
@@ -77,12 +70,14 @@ const App = () => {
           {category}
         </button>
       ))}
-      <List
-        width={400}
-        height={800}
-        rowHeight={100}
-        rowCount={items[selected].length}
-        rowRenderer={renderRow}
+      <div>
+        Filter by name: <input type="text" onChange={filterHandler} />
+      </div>
+      <ItemList
+        items={items}
+        filter={filter}
+        selected={selected}
+        availability={availability}
       />
     </>
   );
