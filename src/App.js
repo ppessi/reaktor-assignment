@@ -1,6 +1,7 @@
 import { React, useState, useMemo, useEffect } from "react";
 
 import ItemList from "./ItemList";
+import CategorySelect from "./CategorySelect";
 
 const App = () => {
   const categories = useMemo(() => ["accessories", "jackets", "shirts"], []);
@@ -83,7 +84,7 @@ const App = () => {
     setFilter(e.target.value);
   };
 
-  const select = (category) => () => {
+  const selectCategory = (category) => () => {
     setSelected(category);
   };
 
@@ -95,11 +96,11 @@ const App = () => {
           {[...errored].join(", ")}
         </div>
       )}
-      {categories.map((category) => (
-        <button key={category} onClick={select(category)}>
-          {category}
-        </button>
-      ))}
+      <CategorySelect
+        categories={categories}
+        select={selectCategory}
+        selected={selected}
+      />
       {selected in items ? (
         <>
           <div>

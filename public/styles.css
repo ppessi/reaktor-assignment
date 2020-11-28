@@ -17,3 +17,7 @@ button {
   height: 40px;
   line-height: 40px;
 }
+
+.selected {
+  background-color: rgb(83, 155, 184);
+}
