@@ -1,12 +1,14 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 
-export const Filters = ({ setFilters, manufacturers }) => {
-  const filterHandler = (key, isNumber = false) => (e) => {
-    const newValue = e.target.value;
-    setFilters((filters) => ({
-      ...filters,
-      [key]: isNumber ? parseInt(newValue) : newValue,
-    }));
+import { setFilter } from "../redux/filters";
+import { manufacturers } from "../constants";
+
+export const Filtering = () => {
+  const dispatch = useDispatch();
+
+  const filterHandler = (key) => (event) => {
+    dispatch(setFilter({ key, value: event.target.value }));
   };
 
   return (
@@ -39,4 +41,4 @@ export const Filters = ({ setFilters, manufacturers }) => {
   );
 };
 
-export default Filters;
+export default Filtering;

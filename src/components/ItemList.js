@@ -1,27 +1,36 @@
 import { React, useState, useEffect } from "react";
 import { Grid } from "react-virtualized";
+import { useSelector } from "react-redux";
 
-export const ItemList = ({ items, filters, selected, availability }) => {
+export const ItemList = () => {
+  const {
+    items,
+    filters,
+    availability,
+    selectedCategory: selected,
+  } = useSelector((state) => state);
   const [filtered, setFiltered] = useState([]);
+
   const widths = [300, 120, 60, 120, 180];
   const columns = ["Name", "Manufacturer", "Price", "Colors", "Availability"];
 
   useEffect(() => {
-    var newFiltered = items[selected];
-    if (filters.name !== "" && filters.name !== undefined)
+    var newFiltered = items[selected] || [];
+    if (filters.name !== "")
       newFiltered = newFiltered.filter((item) =>
         item.name.includes(filters.name.toUpperCase())
       );
-    if (filters.manufacturer !== "" && filters.manufacturer !== undefined)
+    if (filters.manufacturer !== "")
       newFiltered = newFiltered.filter(
         (item) => item.manufacturer === filters.manufacturer
       );
-    if (filters.availability !== -1 && filters.availability !== undefined)
+    if (filters.availability !== -1)
       newFiltered = newFiltered.filter(
-        (item) => availability[item.id] === filters.availability
+        (item) =>
+          availability[item.manufacturer][item.id] === filters.availability
       );
     setFiltered(newFiltered);
-  }, [filters, selected, items, availability]);
+  }, [filters, items, availability, selected]);
 
   const renderCell = ({ columnIndex, rowIndex, key, style }) => {
     const item = filtered[rowIndex];
@@ -36,7 +45,7 @@ export const ItemList = ({ items, filters, selected, availability }) => {
         case 3:
           return item.color.join(", ");
         case 4:
-          const inStock = availability[item.id];
+          const inStock = availability[item.manufacturer][item.id];
           return inStock === undefined ? (
             <div style={{ color: "grey" }}>Loading availity data</div>
           ) : inStock === 0 ? (
@@ -64,7 +73,7 @@ export const ItemList = ({ items, filters, selected, availability }) => {
     );
   };
 
-  return (
+  return filtered.length !== 0 ? (
     <>
       <div className="header">
         {columns.map((col, idx) => (
@@ -86,6 +95,8 @@ export const ItemList = ({ items, filters, selected, availability }) => {
         rowCount={filtered.length}
       />
     </>
+  ) : (
+    <div style={{ marginTop: 30 }}>Loading data from server</div>
   );
 };
 export default ItemList;
