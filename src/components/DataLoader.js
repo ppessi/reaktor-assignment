@@ -5,6 +5,8 @@ import { setCategoryItems } from "../redux/items";
 import { addAvailability } from "../redux/availability";
 import { categories, api_url, manufacturers } from "../constants";
 
+// Loads data from API and updates to state
+
 export const DataLoader = () => {
   const dispatch = useDispatch();
 

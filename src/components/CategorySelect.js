@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { categories } from "../constants";
 import { selectCategory } from "../redux/selectedCategory";
 
+// The category select buttons at the top of the page
+
 export const CategorySelect = () => {
   const selected = useSelector((state) => state.selectedCategory);
   const dispatch = useDispatch();

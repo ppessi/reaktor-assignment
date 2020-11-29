@@ -2,6 +2,8 @@ import { React, useState, useEffect } from "react";
 import { Grid } from "react-virtualized";
 import { useSelector } from "react-redux";
 
+// Renders and filters product info and availability
+
 export const ItemList = () => {
   const {
     items,
@@ -65,7 +67,9 @@ export const ItemList = () => {
         key={key}
         style={{
           ...style,
+          // every other row is a light gray for better readability
           backgroundColor: rowIndex % 2 === 0 ? "#e2e2e2" : "white",
+          // center align text vertically
           lineHeight: `${style.height}px`,
         }}
       >

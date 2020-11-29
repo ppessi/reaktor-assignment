@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 import { setFilter } from "../redux/filters";
 import { manufacturers } from "../constants";
 
+// The filters above the item list
+
 export const Filtering = () => {
   const dispatch = useDispatch();
 
