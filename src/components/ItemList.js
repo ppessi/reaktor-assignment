@@ -9,13 +9,14 @@ export const ItemList = () => {
     availability,
     selectedCategory: selected,
   } = useSelector((state) => state);
-  const [filtered, setFiltered] = useState([]);
+  const [filtered, setFiltered] = useState(items[selected]);
 
   const widths = [300, 120, 60, 120, 180];
   const columns = ["Name", "Manufacturer", "Price", "Colors", "Availability"];
 
   useEffect(() => {
-    var newFiltered = items[selected] || [];
+    var newFiltered = items[selected];
+    if (newFiltered === undefined) return;
     if (filters.name !== "")
       newFiltered = newFiltered.filter((item) =>
         item.name.includes(filters.name.toUpperCase())
@@ -73,30 +74,38 @@ export const ItemList = () => {
     );
   };
 
-  return filtered.length !== 0 ? (
-    <>
-      <div className="header">
-        {columns.map((col, idx) => (
-          <span
-            key={idx}
-            style={{ float: "left", width: widths[idx], height: 30 }}
-          >
-            {col}
-          </span>
-        ))}
-      </div>
-      <Grid
-        cellRenderer={renderCell}
-        columnCount={5}
-        columnWidth={({ index }) => widths[index]}
-        height={600}
-        width={widths.reduce((sum, width) => sum + width, 30)}
-        rowHeight={40}
-        rowCount={filtered.length}
-      />
-    </>
-  ) : (
-    <div style={{ marginTop: 30 }}>Loading data from server</div>
+  return (
+    <div style={{ marginTop: 40 }}>
+      {filtered !== undefined ? (
+        filtered.length !== 0 ? (
+          <>
+            <div className="header">
+              {columns.map((col, idx) => (
+                <span
+                  key={idx}
+                  style={{ float: "left", width: widths[idx], height: 30 }}
+                >
+                  {col}
+                </span>
+              ))}
+            </div>
+            <Grid
+              cellRenderer={renderCell}
+              columnCount={5}
+              columnWidth={({ index }) => widths[index]}
+              height={600}
+              width={widths.reduce((sum, width) => sum + width, 30)}
+              rowHeight={40}
+              rowCount={filtered.length}
+            />
+          </>
+        ) : (
+          "No products match filter"
+        )
+      ) : (
+        "Loading data from server"
+      )}
+    </div>
   );
 };
 export default ItemList;
